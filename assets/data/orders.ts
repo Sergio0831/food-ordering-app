@@ -7,7 +7,7 @@ const now = dayjs();
 const orders: Order[] = [
   {
     id: 23123,
-    created_at: now.subtract(1, 'hour').toISOString(),
+    created_at: now.subtract(3, 'hour').toISOString(),
     total: 31.4,
     status: 'Cooking',
     user_id: '1',

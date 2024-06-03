@@ -16,5 +16,3 @@ const TabIndex = () => {
 };
 
 export default TabIndex;
-
-const styles = StyleSheet.create({});

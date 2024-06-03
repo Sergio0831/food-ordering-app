@@ -4,21 +4,32 @@ import Colors from '../constants/Colors';
 
 type ButtonProps = {
   text: string;
+  transparent?: boolean;
 } & React.ComponentPropsWithoutRef<typeof Pressable>;
 
-const Button = forwardRef<View | null, ButtonProps>(({ text, ...pressableProps }, ref) => {
-  return (
-    <Pressable ref={ref} {...pressableProps} style={styles.container} accessibilityRole="button">
-      <Text style={styles.text}>{text}</Text>
-    </Pressable>
-  );
-});
+const Button = forwardRef<View | null, ButtonProps>(
+  ({ text, transparent, ...pressableProps }, ref) => {
+    return (
+      <Pressable
+        ref={ref}
+        {...pressableProps}
+        style={[
+          styles.container,
+          { backgroundColor: transparent ? 'transparent' : Colors.light.tint },
+        ]}
+        accessibilityRole="button">
+        <Text style={[styles.text, { color: transparent ? Colors.light.tint : '#fff' }]}>
+          {text}
+        </Text>
+      </Pressable>
+    );
+  },
+);
 
 export default Button;
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: Colors.light.tint,
     padding: 15,
     alignItems: 'center',
     borderRadius: 100,
@@ -27,6 +38,5 @@ const styles = StyleSheet.create({
   text: {
     fontSize: 16,
     fontWeight: '600',
-    color: 'white',
   },
 });

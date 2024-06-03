@@ -1,11 +1,12 @@
 import React from 'react';
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { Link, Tabs } from 'expo-router';
+import { Link, Redirect, Tabs } from 'expo-router';
 import { Pressable } from 'react-native';
 
 import Colors from '@/src/constants/Colors';
 import { useColorScheme } from '@/src/hooks/useColorScheme';
 import { useClientOnlyValue } from '@/src/hooks/useClientOnlyValue';
+import { useAuthContext } from '@/src/hooks/useAuthContext';
 
 // You can explore the built-in icon families and icons on the web at https://icons.expo.fyi/
 function TabBarIcon(props: { name: React.ComponentProps<typeof Ionicons>['name']; color: string }) {
@@ -14,6 +15,12 @@ function TabBarIcon(props: { name: React.ComponentProps<typeof Ionicons>['name']
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
+
+  const { session } = useAuthContext();
+
+  if (!session) {
+    return <Redirect href={'/sign-in'} />;
+  }
 
   return (
     <Tabs
@@ -39,10 +46,11 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="two"
+        name="orders"
         options={{
           title: 'Orders',
           tabBarIcon: ({ color }) => <TabBarIcon name="list-outline" color={color} />,
+          headerShown: false,
         }}
       />
     </Tabs>
