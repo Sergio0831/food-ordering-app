@@ -49,8 +49,6 @@ export const AuthContextProvider = ({ children }: PropsWithChildren) => {
     });
   }, []);
 
-  console.log(profile);
-
   const value = {
     session,
     loading,
