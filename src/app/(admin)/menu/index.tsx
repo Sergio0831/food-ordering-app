@@ -1,8 +1,7 @@
-import { ActivityIndicator, FlatList, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, FlatList, StyleSheet, Text } from 'react-native';
 import React from 'react';
-import products from '@/assets/data/products';
 import ProductListItem from '@/src/components/ProductListItem';
-import { useProductsList } from '@/src/api/produscts';
+import { useProductsList } from '@/src/api/products';
 
 const TabIndex = () => {
   const { data: products, error, isLoading } = useProductsList();

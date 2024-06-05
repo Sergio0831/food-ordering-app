@@ -5,7 +5,6 @@ import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
 import 'react-native-reanimated';
-
 import { useColorScheme } from '@/src/hooks/useColorScheme';
 import { CartContextProvider } from '../providers/CartProvider';
 import { AuthContextProvider } from '../providers/AuthProvider';

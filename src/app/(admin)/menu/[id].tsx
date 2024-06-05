@@ -1,17 +1,24 @@
-import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
-import React, { useState } from 'react';
-import { Link, Stack, useLocalSearchParams, useRouter } from 'expo-router';
-import products from '@/assets/data/products';
+import { ActivityIndicator, Image, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Link, Stack, useLocalSearchParams } from 'expo-router';
 import { defaultPizzaImage } from '@/src/components/ProductListItem';
 import { FontAwesome } from '@expo/vector-icons';
 import Colors from '@/src/constants/Colors';
+import { useProduct } from '@/src/api/products';
 
 const ProductPage = () => {
-  const { id } = useLocalSearchParams();
+  const { id: idString } = useLocalSearchParams();
+  const id =
+    idString !== undefined
+      ? parseFloat(typeof idString === 'string' ? idString : idString[0])
+      : NaN;
 
-  const product = products.find((product) => product.id.toString() === id);
+  const { data: product, error, isLoading } = useProduct(id);
 
-  if (!product) {
+  if (isLoading) {
+    return <ActivityIndicator />;
+  }
+
+  if (error && !product) {
     return <Text>Product not found</Text>;
   }
 
@@ -19,7 +26,7 @@ const ProductPage = () => {
     <View style={styles.container}>
       <Stack.Screen
         options={{
-          title: product.name,
+          title: product?.name,
           headerRight: () => (
             <Link href={`/(admin)/menu/create?id=${id}`} asChild>
               <Pressable>
@@ -37,12 +44,12 @@ const ProductPage = () => {
         }}
       />
       <Image
-        source={{ uri: product.image || defaultPizzaImage }}
+        source={{ uri: product?.image || defaultPizzaImage }}
         resizeMode="contain"
         style={styles.image}
       />
-      <Text style={styles.subtitle}>{product.name}</Text>
-      <Text style={styles.price}>Price: &euro;{product.price.toFixed(2)}</Text>
+      <Text style={styles.subtitle}>{product?.name}</Text>
+      <Text style={styles.price}>Price: &euro;{product?.price.toFixed(2)}</Text>
     </View>
   );
 };

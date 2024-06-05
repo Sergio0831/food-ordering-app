@@ -1,20 +1,43 @@
 import { Alert, Image, StyleSheet, Text, TextInput, View } from 'react-native';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Colors from '@/src/constants/Colors';
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import * as ImagePicker from 'expo-image-picker';
 import { defaultPizzaImage } from '@/src/components/ProductListItem';
 import Button from '@/src/components/Button';
+import {
+  useCreateProduct,
+  useDeleteProduct,
+  useProduct,
+  useUpdateProduct,
+} from '@/src/api/products';
 
 const CreateScreen = () => {
   const [image, setImage] = useState<string | null>(null);
   const [name, setName] = useState('');
   const [price, setPrice] = useState('');
   const [errors, setErrors] = useState('');
+  const { id: idString } = useLocalSearchParams();
+
+  const id =
+    idString !== undefined
+      ? parseFloat(typeof idString === 'string' ? idString : idString[0])
+      : NaN;
+  const { data: updatedProduct, isLoading } = useProduct(id);
+  const { mutate: createProduct, isPending } = useCreateProduct();
+  const { mutate: updateProduct } = useUpdateProduct();
+  const { mutate: deleteProduct } = useDeleteProduct();
 
   const router = useRouter();
-  const { id } = useLocalSearchParams();
-  const isUpdating = !!id;
+  const isUpdating = !!idString;
+
+  useEffect(() => {
+    if (updatedProduct) {
+      setName(updatedProduct.name);
+      setPrice(updatedProduct.price.toString());
+      setImage(updatedProduct.image);
+    }
+  }, [updateProduct]);
 
   const validateInput = () => {
     setErrors('');
@@ -43,18 +66,36 @@ const CreateScreen = () => {
     if (!validateInput()) {
       return;
     }
-    console.warn('Updating product');
-    resetFields();
-    router.back();
+
+    updateProduct(
+      {
+        id,
+        name,
+        price: parseFloat(price),
+        image,
+      },
+      {
+        onSuccess: () => {
+          resetFields();
+          router.back();
+        },
+      },
+    );
   };
 
   const onCreate = () => {
     if (!validateInput()) {
       return;
     }
-    console.warn('Creating product');
-    resetFields();
-    router.back();
+    createProduct(
+      { name, image, price: parseFloat(price) },
+      {
+        onSuccess: () => {
+          resetFields();
+          router.back();
+        },
+      },
+    );
   };
 
   const onSubmit = () => {
@@ -66,7 +107,11 @@ const CreateScreen = () => {
   };
 
   const onDelete = () => {
-    console.warn('DELETE!!!!!!!!!!');
+    deleteProduct(id, {
+      onSuccess() {
+        router.push('/menu');
+      },
+    });
   };
 
   const onConfirmDelete = () => {
@@ -97,7 +142,17 @@ const CreateScreen = () => {
 
   return (
     <View style={styles.container}>
-      <Stack.Screen options={{ title: isUpdating ? 'Update Product' : 'Create Product' }} />
+      <Stack.Screen
+        options={{
+          title: isUpdating
+            ? isLoading
+              ? 'Updating Product'
+              : 'Update Product'
+            : isPending
+            ? 'Creating Product...'
+            : 'Create Product',
+        }}
+      />
 
       <Image
         resizeMode="contain"
